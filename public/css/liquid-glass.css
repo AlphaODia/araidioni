@@ -1,0 +1,126 @@
+/* Effet Liquid Glass */
+:root {
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --secondary: #7c3aed;
+    --light: #f3f4f6;
+    --dark: #1f2937;
+}
+
+/* Header avec effet Liquid Glass */
+.liquid-glass-header {
+    background: rgba(255, 255, 255, 0.15) !important;
+    backdrop-filter: blur(12px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2), inset 0 4px 20px rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Body avec effet Liquid Glass */
+body.liquid-glass-enabled {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+body.liquid-glass-enabled .min-h-screen {
+    background: transparent !important;
+}
+
+/* Conteneurs avec effet Liquid Glass */
+.liquid-glass-container {
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Inputs avec effet Liquid Glass */
+.liquid-glass-enabled input,
+.liquid-glass-enabled select,
+.liquid-glass-enabled textarea {
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(5px) !important;
+    -webkit-backdrop-filter: blur(5px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+}
+
+.liquid-glass-enabled input::placeholder,
+.liquid-glass-enabled textarea::placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.liquid-glass-enabled label {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.liquid-glass-enabled h1,
+.liquid-glass-enabled h2,
+.liquid-glass-enabled h3,
+.liquid-glass-enabled p {
+    color: white !important;
+}
+
+/* Bouton de toggle */
+.glass-toggle-header {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(31, 38, 135, 0.2);
+    transition: all 0.3s ease;
+    margin-left: 1rem;
+}
+
+.glass-toggle-header:hover {
+    transform: scale(1.1);
+}
+
+.glass-toggle-header i {
+    font-size: 1.2rem;
+    color: var(--primary);
+}
+
+/* Désactiver l'effet sur certaines pages */
+body.no-liquid-glass .glass-toggle-header {
+    display: none !important;
+}
+
+/* Footer avec effet Liquid Glass */
+.liquid-glass-enabled footer {
+    background: rgba(15, 23, 42, 0.9) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+}
+
+/* Cartes avec effet Liquid Glass */
+.liquid-glass-enabled .bg-white {
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+/* Textes avec contraste amélioré */
+.liquid-glass-enabled .text-gray-700,
+.liquid-glass-enabled .text-gray-600,
+.liquid-glass-enabled .text-gray-800 {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.liquid-glass-enabled .text-blue-100 {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Boutons avec effet glass */
+.liquid-glass-enabled .bg-blue-600 {
+    background: rgba(79, 70, 229, 0.8) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+.liquid-glass-enabled .bg-blue-600:hover {
+    background: rgba(79, 70, 229, 1) !important;
+}

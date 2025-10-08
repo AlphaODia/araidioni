@@ -1,0 +1,1348 @@
+@extends('layouts.client.app')
+
+@section('title', 'Voyages')
+
+@section('styles')
+<style>
+:root {
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --secondary: #7c3aed;
+    --light: #f3f4f6;
+    --dark: #1f2937;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #1f2937;
+    min-height: 100vh;
+    transition: all 0.5s ease;
+}
+
+/* Correction du fond blanc quand Liquid Glass est désactivé */
+body.no-glass-effect {
+    background: white !important;
+}
+
+body.no-glass-effect .liquid-glass {
+    background: white;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    color: #1f2937 !important;
+}
+
+body.no-glass-effect .liquid-glass-dark {
+    background: #1f2937;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid #374151;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+body.no-glass-effect .search-input,
+body.no-glass-effect .search-select {
+    background: white;
+    color: #1f2937;
+    border: 1px solid #d1d5db;
+}
+
+body.no-glass-effect .search-input::placeholder {
+    color: #6b7280;
+}
+
+body.no-glass-effect .form-label,
+body.no-glass-effect .hero-title,
+body.no-glass-effect .hero-subtitle,
+body.no-glass-effect .section-title,
+body.no-glass-effect .trip-route,
+body.no-glass-effect .trip-info,
+body.no-glass-effect .trip-meta-item,
+body.no-glass-effect .price-from,
+body.no-glass-effect .price-amount,
+body.no-glass-effect .feature-title,
+body.no-glass-effect .feature-description,
+body.no-glass-effect .testimonial-name,
+body.no-glass-effect .testimonial-text,
+body.no-glass-effect .testimonial-rating {
+    color: #1f2937 !important;
+    text-shadow: none;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+/* Effet Liquid Glass */
+.liquid-glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2), 
+                inset 0 4px 20px rgba(255, 255, 255, 0.3);
+}
+
+/* Hero Section */
+.hero {
+    padding: 8rem 0 3rem;
+    margin-bottom: 2rem;
+}
+
+.hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.hero-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    max-width: 600px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Search Form */
+.search-form {
+    border-radius: 1rem;
+    padding: 2rem;
+    max-width: 900px;
+    width: 100%;
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: white;
+}
+
+.search-input, .search-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.search-input:focus, .search-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.search-input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.btn-search {
+    background: var(--secondary);
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.btn-search:hover {
+    background: #6d28d9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Main Content */
+.main-content {
+    padding: 2rem 0;
+}
+
+.section-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 2rem;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Trip Cards */
+.trips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.trip-card {
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.trip-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.trip-image {
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+}
+
+.trip-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+}
+
+.trip-card:hover .trip-image img {
+    transform: scale(1.05);
+}
+
+.trip-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.trip-details {
+    padding: 1.5rem;
+}
+
+.trip-route {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: white;
+}
+
+.trip-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.trip-meta {
+    display: flex;
+    justify-content: space-between;
+    margin: 1rem 0;
+}
+
+.trip-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.875rem;
+}
+
+.trip-price {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding-top: 1rem;
+    margin-top: 1rem;
+}
+
+.price-from {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.price-amount {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+}
+
+.btn {
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-outline {
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    background: transparent;
+}
+
+.btn-outline:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+}
+
+/* Features Section */
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.feature-card {
+    border-radius: 1rem;
+    padding: 1.5rem;
+    text-align: center;
+    transition: transform 0.3s;
+}
+
+.feature-card:hover {
+    transform: translateY(-4px);
+}
+
+.feature-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(to right, #ddd6fe, #c4b5fd);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+}
+
+.feature-icon i {
+    font-size: 1.5rem;
+    color: var(--primary);
+}
+
+.feature-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: white;
+}
+
+.feature-description {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Testimonials */
+.testimonials {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.testimonial-card {
+    border-radius: 1rem;
+    padding: 1.5rem;
+}
+
+.testimonial-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.testimonial-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.testimonial-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.testimonial-name {
+    font-weight: 600;
+    color: white;
+}
+
+.testimonial-rating {
+    color: #f59e0b;
+    margin-top: 0.25rem;
+}
+
+.testimonial-text {
+    color: rgba(255, 255, 255, 0.8);
+    font-style: italic;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 1rem;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #6b7280;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+/* Seat Selection */
+.seat-layout {
+    margin-bottom: 2rem;
+}
+
+.seat-legend {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+}
+
+.legend-available {
+    background: #bbf7d0;
+    border: 1px solid #22c55e;
+}
+
+.legend-reserved {
+    background: #fed7aa;
+    border: 1px solid #f97316;
+}
+
+.legend-selected {
+    background: #bfdbfe;
+    border: 1px solid #3b82f6;
+}
+
+.legend-driver {
+    background: #ddd6fe;
+    border: 1px solid #8b5cf6;
+}
+
+.bus-layout {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+    justify-content: center;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.minicar-layout {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    justify-content: center;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.taxi-layout {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    justify-content: center;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.seat {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin: 0 auto;
+}
+
+.seat-available {
+    background: #bbf7d0;
+    border: 1px solid #22c55e;
+    color: #22543d;
+}
+
+.seat-reserved {
+    background: #fed7aa;
+    border: 1px solid #f97316;
+    color: #742a2a;
+    cursor: not-allowed;
+}
+
+.seat-selected {
+    background: #bfdbfe;
+    border: 1px solid #3b82f6;
+    color: #2c5282;
+}
+
+.seat-driver {
+    background: #ddd6fe;
+    border: 1px solid #8b5cf6;
+    color: #44337a;
+    cursor: default;
+    grid-column: span 1;
+}
+
+.aisle {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.aisle::after {
+    content: "↔";
+    color: #a0aec0;
+    font-size: 1.2rem;
+}
+
+.selected-seats {
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+    text-align: center;
+    font-weight: 500;
+}
+
+.modal-footer {
+    padding: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    position: sticky;
+    bottom: 0;
+    background: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero {
+        padding: 10rem 0 3rem;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .seat {
+        width: 35px;
+        height: 35px;
+        font-size: 0.875rem;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+    }
+    
+    .modal-footer .btn {
+        width: 100%;
+    }
+}
+</style>
+@endsection
+
+@section('content')
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title">Réservez votre voyage en toute sérénité</h1>
+            <p class="hero-subtitle">Découvrez les meilleurs trajets entre la Guinée et le Sénégal</p>
+            
+            <!-- Search Form -->
+            <form class="search-form liquid-glass" id="searchForm" method="GET" action="{{ route('voyages') }}">
+                @csrf
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Départ</label>
+                        <input type="text" name="depart" class="search-input" placeholder="Ex: Dakar" required 
+                               value="{{ request('depart') }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Destination</label>
+                        <input type="text" name="destination" class="search-input" placeholder="Ex: Conakry" required
+                               value="{{ request('destination') }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Date</label>
+                        <input type="date" name="date" class="search-input" required
+                               value="{{ request('date') }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Type de véhicule</label>
+                        <select name="vehicle_type" class="search-select" required>
+                            <option value="">Sélectionnez un type</option>
+                            <option value="bus" {{ request('vehicle_type') == 'bus' ? 'selected' : '' }}>Bus</option>
+                            <option value="minicar" {{ request('vehicle_type') == 'minicar' ? 'selected' : '' }}>Mini-car</option>
+                            <option value="taxi" {{ request('vehicle_type') == 'taxi' ? 'selected' : '' }}>Taxi VIP</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn-search">Rechercher</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<main class="main-content">
+    <div class="container">
+        <h2 class="section-title">Trajets disponibles</h2>
+        
+        <div class="trips-grid" id="tripsContainer">
+            <!-- Les trajets seront chargés dynamiquement ici -->
+            <div class="text-center py-12">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-100 rounded-full mb-4">
+                    <i class="fas fa-spinner fa-spin text-indigo-600 text-2xl"></i>
+                </div>
+                <p class="text-white">Chargement des trajets...</p>
+            </div>
+        </div>
+        
+        <!-- Why Choose Us Section -->
+        <h2 class="section-title">Pourquoi choisir Ari Dioni ?</h2>
+        
+        <div class="features">
+            <div class="feature-card liquid-glass">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="feature-title">Sécurité garantie</h3>
+                <p class="feature-description">Nos véhicules sont régulièrement inspectés et nos conducteurs rigoureusement sélectionnés.</p>
+            </div>
+            
+            <div class="feature-card liquid-glass">
+                <div class="feature-icon">
+                    <i class="far fa-clock"></i>
+                </div>
+                <h3 class="feature-title">Ponctualité</h3>
+                <p class="feature-description">Nous respectons scrupuleusement les horaires pour que vous arriviez toujours à temps.</p>
+            </div>
+            
+            <div class="feature-card liquid-glass">
+                <div class="feature-icon">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h3 class="feature-title">Support 24/7</h3>
+                <p class="feature-description">Notre équipe est disponible 24h/24 et 7j/7 pour répondre à vos questions.</p>
+            </div>
+        </div>
+        
+        <!-- Testimonials Section -->
+        <h2 class="section-title">Ce que disent nos clients</h2>
+        
+        <div class="testimonials">
+            <div class="testimonial-card liquid-glass">
+                <div class="testimonial-header">
+                    <div class="testimonial-avatar">
+                        <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Aissatou Diallo">
+                    </div>
+                    <div>
+                        <div class="testimonial-name">Aissatou Diallo</div>
+                        <div class="testimonial-rating">★★★★★</div>
+                    </div>
+                </div>
+                <p class="testimonial-text">"Service exceptionnel ! Le trajet était confortable et ponctuel. Je recommande vivement Ari Dioni pour tous vos déplacements."</p>
+            </div>
+            
+            <div class="testimonial-card liquid-glass">
+                <div class="testimonial-header">
+                    <div class="testimonial-avatar">
+                        <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Mamadou Bah">
+                    </div>
+                    <div>
+                        <div class="testimonial-name">Mamadou Bah</div>
+                        <div class="testimonial-rating">★★★★★</div>
+                    </div>
+                </div>
+                <p class="testimonial-text">"J'ai été impressionné par le professionnalisme de l'équipe. Le bus était propre et climatisé. Excellent voyage!"</p>
+            </div>
+            
+            <div class="testimonial-card liquid-glass">
+                <div class="testimonial-header">
+                    <div class="testimonial-avatar">
+                        <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Fatoumata Binta">
+                    </div>
+                    <div>
+                        <div class="testimonial-name">Fatoumata Binta</div>
+                        <div class="testimonial-rating">★★★★☆</div>
+                    </div>
+                </div>
+                <p class="testimonial-text">"Service ponctuel et sécurisé. J'ai apprécié le suivi en temps réel de mon colis. Merci Ari Dioni!"</p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Seat Selection Modal -->
+<div class="modal" id="seatModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Sélection des sièges</h2>
+            <button class="modal-close" onclick="closeSeatSelection()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="seat-layout">
+                <div class="seat-legend">
+                    <div class="legend-item">
+                        <div class="legend-color legend-available"></div>
+                        <span>Disponible</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color legend-reserved"></div>
+                        <span>Réservé</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color legend-selected"></div>
+                        <span>Votre choix</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color legend-driver"></div>
+                        <span>Conducteur</span>
+                    </div>
+                </div>
+                
+                <div id="busLayout" class="bus-layout" style="display: none;">
+                    <!-- Généré dynamiquement par JavaScript -->
+                </div>
+                
+                <div id="minicarLayout" class="minicar-layout" style="display: none;">
+                    <!-- Généré dynamiquement par JavaScript -->
+                </div>
+                
+                <div id="taxiLayout" class="taxi-layout" style="display: none;">
+                    <!-- Généré dynamiquement par JavaScript -->
+                </div>
+            </div>
+            
+            <div class="selected-seats" id="selectedSeats">
+                Aucun siège sélectionné
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeSeatSelection()">Annuler</button>
+                <button class="btn btn-primary" onclick="confirmReservation()">Confirmer la réservation</button>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@section('scripts')
+<script>
+// Configuration et état global
+const CONFIG = {
+    glassEffectKey: 'glassEffect',
+    apiEndpoints: {
+        voyages: '/api/voyages',
+        reservedSeats: '/api/voyages/',
+        reservation: '/api/reserver',
+        search: '{{ route("voyages.search") }}'
+    },
+    vehicleTypes: {
+        bus: { seats: 53, duration: '12h' },
+        minicar: { seats: 14, duration: '10h' },
+        taxi: { seats: 6, duration: '9h' }
+    }
+};
+
+// État de l'application
+const APP_STATE = {
+    glassEnabled: true,
+    selectedSeats: [],
+    currentVehicleType: '',
+    currentTripId: '',
+    currentTripDetails: {},
+    allTrips: []
+};
+
+// Initialisation de l'application
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Initialisation de la page voyages...');
+    initializeGlassEffect();
+    initializeSearchForm();
+    loadTripsFromBackend();
+});
+
+// Gestion de l'effet glass
+function initializeGlassEffect() {
+    const savedPreference = localStorage.getItem(CONFIG.glassEffectKey);
+    if (savedPreference !== null) {
+        APP_STATE.glassEnabled = savedPreference === 'true';
+        updateGlassEffect();
+    }
+
+    const glassToggle = document.getElementById('glassToggleHeader');
+    if (glassToggle) {
+        glassToggle.addEventListener('click', toggleGlassEffect);
+    }
+}
+
+function toggleGlassEffect() {
+    APP_STATE.glassEnabled = !APP_STATE.glassEnabled;
+    updateGlassEffect();
+    localStorage.setItem(CONFIG.glassEffectKey, APP_STATE.glassEnabled);
+}
+
+function updateGlassEffect() {
+    document.body.classList.toggle('no-glass-effect', !APP_STATE.glassEnabled);
+    const glassToggle = document.getElementById('glassToggleHeader');
+    if (glassToggle) {
+        glassToggle.innerHTML = APP_STATE.glassEnabled ? 
+            '<i class="fas fa-glass-whiskey"></i>' : 
+            '<i class="fas fa-times"></i>';
+    }
+}
+
+// Formulaire de recherche
+function initializeSearchForm() {
+    const searchForm = document.getElementById('searchForm');
+    if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const searchParams = new URLSearchParams();
+            
+            for (let [key, value] of formData) {
+                if (value) searchParams.append(key, value);
+            }
+            
+            // Recharge la page avec les paramètres de recherche
+            window.location.href = `{{ route('voyages') }}?${searchParams.toString()}`;
+        });
+    }
+}
+
+// Chargement des voyages
+async function loadTripsFromBackend() {
+    try {
+        console.log('🌐 Chargement des voyages...');
+        
+        const response = await fetch(CONFIG.apiEndpoints.voyages, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Erreur HTTP: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('✅ Données reçues:', result);
+        
+        if (result.success && Array.isArray(result.data)) {
+            displayTrips(result.data);
+        } else if (result.trajets) {
+            displayTrips(result.trajets);
+        } else {
+            showNoTripsMessage();
+        }
+        
+    } catch (error) {
+        console.error('💥 Erreur:', error);
+        displayError('Impossible de charger les voyages. Veuillez réessayer.');
+    }
+}
+
+function displayError(message) {
+    const tripsContainer = document.getElementById('tripsContainer');
+    if (!tripsContainer) return;
+    
+    tripsContainer.innerHTML = `
+        <div class="text-center py-12 rounded-xl liquid-glass border border-red-200">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+                <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-medium text-white mb-2">Erreur de chargement</h3>
+            <p class="text-white max-w-md mx-auto">${message}</p>
+            <button onclick="loadTripsFromBackend()" class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                Réessayer
+            </button>
+        </div>
+    `;
+}
+
+function showNoTripsMessage() {
+    const tripsContainer = document.getElementById('tripsContainer');
+    if (!tripsContainer) return;
+    
+    tripsContainer.innerHTML = `
+        <div class="text-center py-12 rounded-xl liquid-glass border border-indigo-200">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-100 rounded-full mb-4">
+                <i class="fas fa-info-circle text-indigo-600 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-medium text-white mb-2">Aucun trajet trouvé</h3>
+            <p class="text-white max-w-md mx-auto">Nous n'avons trouvé aucun trajet correspondant à vos critères.</p>
+        </div>
+    `;
+}
+
+// Affichage des voyages
+function displayTrips(trips) {
+    const tripsContainer = document.getElementById('tripsContainer');
+    if (!tripsContainer) return;
+    
+    if (!trips || trips.length === 0) {
+        showNoTripsMessage();
+        return;
+    }
+
+    console.log('Affichage de', trips.length, 'voyages');
+    
+    try {
+        const tripsHTML = trips.map(trip => createTripCard(trip)).join('');
+        tripsContainer.innerHTML = tripsHTML;
+    } catch (error) {
+        console.error('Erreur affichage voyages:', error);
+        displayError('Erreur lors de l\'affichage des voyages.');
+    }
+}
+
+function createTripCard(trip) {
+    const normalizedTrip = normalizeTripData(trip);
+    const { departure, arrival, date, time, price, vehicleType, availableSeats, id } = normalizedTrip;
+    const duration = CONFIG.vehicleTypes[vehicleType]?.duration || 'N/A';
+    const vehicleImage = getVehicleImage(vehicleType);
+
+    return `
+        <div class="trip-card liquid-glass">
+            <div class="trip-image">
+                <img src="${vehicleImage}" alt="${vehicleType}" loading="lazy">
+                <div class="trip-badge">${vehicleType.toUpperCase()}</div>
+            </div>
+            <div class="trip-details">
+                <h3 class="trip-route">${escapeHtml(departure)} → ${escapeHtml(arrival)}</h3>
+                <div class="trip-info">
+                    <i class="far fa-calendar-alt"></i>
+                    <span>${formatDate(date)} • ${formatTime(time)}</span>
+                </div>
+                <div class="trip-meta">
+                    <div class="trip-meta-item">
+                        <i class="far fa-clock"></i>
+                        <span>~${duration}</span>
+                    </div>
+                    <div class="trip-meta-item">
+                        <i class="fas fa-chair"></i>
+                        <span>${availableSeats} places restantes</span>
+                    </div>
+                </div>
+                <div class="trip-price">
+                    <div>
+                        <div class="price-from">À partir de</div>
+                        <div class="price-amount">${parseInt(price).toLocaleString()} GNF</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="openSeatSelection('${escapeQuotes(vehicleType)}', '${escapeQuotes(id)}', ${escapeQuotes(JSON.stringify(trip))})">
+                        Choisir un siège
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function normalizeTripData(trip) {
+    return {
+        departure: trip.ville_depart || trip.departure || trip.depart || 'Non spécifié',
+        arrival: trip.ville_arrivee || trip.arrival || trip.arrivee || 'Non spécifié',
+        date: trip.date_depart || trip.date || '',
+        time: trip.heure_depart || trip.departure_time || trip.time || '',
+        price: trip.prix || trip.price || 0,
+        vehicleType: trip.vehicule_type || trip.vehicle_type || trip.type_vehicule || 'bus',
+        availableSeats: trip.available_seats || trip.places_restantes || 0,
+        id: trip.id || Math.random().toString(36).substr(2, 9)
+    };
+}
+
+function formatDate(dateString) {
+    if (!dateString) return 'Date non spécifiée';
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('fr-FR', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    } catch (error) {
+        return dateString;
+    }
+}
+
+function formatTime(timeString) {
+    if (!timeString) return 'Heure non spécifiée';
+    return timeString.substring(0, 5);
+}
+
+function getVehicleImage(vehicleType) {
+    const images = {
+        bus: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+        minicar: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+        taxi: 'https://images.unsplash.com/photo-1542362567-b07e54358753?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+    };
+    return images[vehicleType] || images.bus;
+}
+
+function escapeQuotes(value) {
+    if (typeof value === 'string') {
+        return value.replace(/"/g, '&quot;').replace(/'/g, '&#x27;');
+    }
+    return JSON.stringify(value).replace(/"/g, '&quot;').replace(/'/g, '&#x27;');
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Gestion des sièges
+async function openSeatSelection(vehicleType, tripId, tripDetails) {
+    APP_STATE.currentVehicleType = vehicleType;
+    APP_STATE.currentTripId = tripId;
+    APP_STATE.currentTripDetails = typeof tripDetails === 'string' ? JSON.parse(tripDetails) : tripDetails;
+    APP_STATE.selectedSeats = [];
+
+    hideAllLayouts();
+    showCorrectLayout(vehicleType);
+    await loadReservedSeats(tripId);
+
+    const seatModal = document.getElementById('seatModal');
+    if (seatModal) {
+        seatModal.style.display = 'flex';
+    }
+    
+    const selectedSeatsDisplay = document.getElementById('selectedSeats');
+    if (selectedSeatsDisplay) {
+        selectedSeatsDisplay.textContent = 'Aucun siège sélectionné';
+    }
+}
+
+function hideAllLayouts() {
+    const layouts = ['busLayout', 'minicarLayout', 'taxiLayout'];
+    layouts.forEach(layoutId => {
+        const layout = document.getElementById(layoutId);
+        if (layout) layout.style.display = 'none';
+    });
+}
+
+function showCorrectLayout(vehicleType) {
+    const layoutMap = {
+        'bus': 'busLayout',
+        'minicar': 'minicarLayout',
+        'taxi': 'taxiLayout'
+    };
+
+    const layoutId = layoutMap[vehicleType];
+    const layout = document.getElementById(layoutId);
+    
+    if (layout) {
+        if (vehicleType === 'bus') {
+            generateBusLayout();
+        } else if (vehicleType === 'minicar') {
+            generateMinicarLayout();
+        } else if (vehicleType === 'taxi') {
+            generateTaxiLayout();
+        }
+        layout.style.display = 'grid';
+    }
+}
+
+function generateBusLayout() {
+    const busLayout = document.getElementById('busLayout');
+    if (!busLayout) return;
+    
+    let html = '<div class="seat seat-driver">D</div>';
+    
+    for (let i = 0; i < 4; i++) {
+        html += '<div class="aisle"></div>';
+    }
+    
+    for (let row = 1; row <= 12; row++) {
+        for (let seatNum = 1; seatNum <= 4; seatNum++) {
+            const seatNumber = (row - 1) * 4 + seatNum;
+            html += `<div class="seat seat-available" onclick="toggleSeat(this, '${seatNumber}')">${seatNumber}</div>`;
+            
+            if (seatNum === 2) {
+                html += '<div class="aisle"></div>';
+            }
+        }
+    }
+    
+    for (let i = 49; i <= 53; i++) {
+        html += `<div class="seat seat-available" onclick="toggleSeat(this, '${i}')">${i}</div>`;
+    }
+
+    busLayout.innerHTML = html;
+}
+
+function generateMinicarLayout() {
+    const minicarLayout = document.getElementById('minicarLayout');
+    if (!minicarLayout) return;
+    
+    let html = '<div class="seat seat-driver">D</div><div class="aisle"></div>';
+    
+    for (let i = 1; i <= 14; i++) {
+        html += `<div class="seat seat-available" onclick="toggleSeat(this, '${i}')">${i}</div>`;
+    }
+    
+    minicarLayout.innerHTML = html;
+}
+
+function generateTaxiLayout() {
+    const taxiLayout = document.getElementById('taxiLayout');
+    if (!taxiLayout) return;
+    
+    let html = '<div class="seat seat-driver">D</div><div class="aisle"></div>';
+    
+    for (let i = 1; i <= 6; i++) {
+        html += `<div class="seat seat-available" onclick="toggleSeat(this, '${i}')">${i}</div>`;
+    }
+    
+    taxiLayout.innerHTML = html;
+}
+
+function toggleSeat(element, seatNumber) {
+    if (element.classList.contains('seat-reserved') || element.classList.contains('seat-driver')) {
+        return;
+    }
+
+    const isSelected = element.classList.contains('seat-selected');
+    
+    element.classList.toggle('seat-selected', !isSelected);
+    element.classList.toggle('seat-available', isSelected);
+
+    if (isSelected) {
+        APP_STATE.selectedSeats = APP_STATE.selectedSeats.filter(seat => seat !== seatNumber);
+    } else {
+        APP_STATE.selectedSeats.push(seatNumber);
+    }
+
+    updateSelectedSeatsDisplay();
+}
+
+function updateSelectedSeatsDisplay() {
+    const selectedSeatsDisplay = document.getElementById('selectedSeats');
+    if (selectedSeatsDisplay) {
+        selectedSeatsDisplay.textContent = APP_STATE.selectedSeats.length > 0 ?
+            `Sièges sélectionnés: ${APP_STATE.selectedSeats.join(', ')}` :
+            'Aucun siège sélectionné';
+    }
+}
+
+async function loadReservedSeats(voyageId) {
+    try {
+        const response = await fetch(`${CONFIG.apiEndpoints.reservedSeats}${voyageId}/sieges`);
+        if (!response.ok) return;
+
+        const result = await response.json();
+        const reservedSeats = result.reserved_seats || [];
+
+        document.querySelectorAll('.seat').forEach(seat => {
+            const seatNumber = seat.textContent.trim();
+            if (reservedSeats.includes(seatNumber) && !seat.classList.contains('seat-driver')) {
+                seat.classList.remove('seat-available', 'seat-selected');
+                seat.classList.add('seat-reserved');
+                seat.onclick = null;
+            }
+        });
+    } catch (error) {
+        console.error("Erreur chargement sièges réservés:", error);
+    }
+}
+
+function closeSeatSelection() {
+    const seatModal = document.getElementById('seatModal');
+    if (seatModal) {
+        seatModal.style.display = 'none';
+    }
+}
+
+// Réservation
+async function confirmReservation() {
+    if (APP_STATE.selectedSeats.length === 0) {
+        alert('Veuillez sélectionner au moins un siège.');
+        return;
+    }
+
+    try {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+        if (!csrfToken) throw new Error('Token CSRF non trouvé');
+
+        const response = await fetch(CONFIG.apiEndpoints.reservation, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                voyage_id: APP_STATE.currentTripId,
+                sieges: APP_STATE.selectedSeats
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            alert(`Réservation confirmée! Sièges: ${APP_STATE.selectedSeats.join(', ')}`);
+            closeSeatSelection();
+            if (result.reservation_id) {
+                window.location.href = `/ticket/${result.reservation_id}`;
+            }
+        } else {
+            alert(result.message || 'Erreur lors de la réservation');
+        }
+    } catch (error) {
+        console.error("Erreur réservation:", error);
+        alert("Une erreur s'est produite. Veuillez réessayer.");
+    }
+}
+
+// Fermeture modale au clic en dehors
+document.addEventListener('click', function(event) {
+    const seatModal = document.getElementById('seatModal');
+    if (event.target === seatModal) {
+        closeSeatSelection();
+    }
+});
+
+// Exposer les fonctions globales
+window.openSeatSelection = openSeatSelection;
+window.toggleSeat = toggleSeat;
+window.closeSeatSelection = closeSeatSelection;
+window.confirmReservation = confirmReservation;
+window.loadTripsFromBackend = loadTripsFromBackend;
+</script>
+@endsection
