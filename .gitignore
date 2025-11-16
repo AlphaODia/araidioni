@@ -22,3 +22,5 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+/firebase-debug.log
+/firebase-credentials.json
