@@ -1,20 +1,20 @@
 <header class="fixed w-full z-50 liquid-glass-header">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <div class="container mx-auto px-6 py-4">
         <div class="flex items-center justify-between">
             <!-- Logo -->
-                <!-- Logo -->
-                <a href="{{ route('home') }}" class="flex items-center bg-white">
-                    <span class="ml-3 text-xl font-bold" style="
-                         background: linear-gradient(90deg, #333333, #666666, #999999);
-                         -webkit-background-clip: text;
-                         -webkit-text-fill-color: transparent;
-                         font-weight: bold;
-                         font-size: 1.5rem;
-                         ">
-                         ARAI DIONI
-                    </span>
-                    <img src="{{ asset('images/logo.png') }}" alt="Ari Dioni" class="h-10">
-                </a>
+            <a href="{{ route('home') }}" class="flex items-center bg-white rounded-lg p-2">
+                <span class="ml-3 text-xl font-bold" style="
+                     background: linear-gradient(90deg, #333333, #666666, #999999);
+                     -webkit-background-clip: text;
+                     -webkit-text-fill-color: transparent;
+                     font-weight: bold;
+                     font-size: 1.5rem;
+                     ">
+                     ARAI DIONI
+                </span>
+                <img src="{{ asset('images/logo.png') }}" alt="Ari Dioni" class="h-10">
+            </a>
 
             <!-- Navigation Desktop -->
             <nav class="hidden md:flex space-x-8">

@@ -19,4 +19,12 @@ Route::post('/reservations/unified', [VoyageController::class, 'createReservatio
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/mes-reservations', [VoyageController::class, 'mesReservations']);
     Route::delete('/reservations/{reservationId}', [VoyageController::class, 'annulerReservation']);
+
+
+
 });
+
+
+Route::get('/voyages', [VoyageController::class, 'apiIndex']);
+Route::get('/voyages/{voyageId}/sieges', [VoyageController::class, 'getSiegesReserves']);
+Route::post('/reservations/unified', [VoyageController::class, 'createReservationUnified']);

@@ -1,8 +1,14 @@
-@extends('layouts.client.app')
-
-@section('title', 'Voyages')
-
-@section('styles')
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transport Guinée-Sénégal - Accueil</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -1498,16 +1504,437 @@
                 padding: 20px;
             }
         }
-    </style>    
-@endsection
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="fixed w-full z-50">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <a href="{{ route('home') }}" class="flex items-center bg-white">
+                    <span class="ml-3 text-xl font-bold" style="
+                         background: linear-gradient(90deg, #333333, #666666, #999999);
+                         -webkit-background-clip: text;
+                         -webkit-text-fill-color: transparent;
+                         font-weight: bold;
+                         font-size: 1.5rem;
+                         ">
+                         ARAI DIONI
+                    </span>
+                    <img src="{{ asset('images/logo.png') }}" alt="Ari Dioni" class="h-10">
+                </a>
 
-@section('content')
-    @include('client.voyages.partials.hero')
-    @include('client.voyages.partials.trips-grid')
-    @include('client.voyages.components.modal-seats')
-@endsection
 
-@section('scripts')
+
+                <!-- Navigation Desktop -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="{{ route('voyages') }}" class="text-gray-700 hover:text-indigo-600 font-medium hover:bg-white/20 py-2 px-4 rounded-lg transition">Voyages</a>
+                    <a href="{{ route('colis.index') }}" class="text-gray-700 hover:text-indigo-600 font-medium hover:bg-white/20 py-2 px-4 rounded-lg transition">Colis</a>
+                    <a href="{{ route('hebergements') }}" class="text-gray-700 hover:text-indigo-600 font-medium hover:bg-white/20 py-2 px-4 rounded-lg transition">Hébergements</a>
+                </nav>
+
+                <!-- Boutons CTA et Glass Toggle -->
+                <div class="flex items-center space-x-4">
+                    @auth
+                        <a href="{{ route('client.dashboard') }}" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                            Mon compte
+                        </a>
+                    @else
+                        <a href="{{ route('login') }}" class="text-gray-700 hover:text-indigo-600 font-medium hover:bg-white/20 py-2 px-4 rounded-lg transition">Connexion</a>
+                        <a href="{{ route('register') }}" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                            Inscription
+                        </a>
+                    @endauth
+                    
+                    <!-- Glass Effect Toggle Button in Header -->
+                    <div class="glass-toggle-header" id="glassToggleHeader">
+                        <i class="fas fa-glass-whiskey"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Menu Mobile -->
+            <div class="md:hidden mt-4">
+                <button id="mobile-menu-button" class="text-gray-700 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4极h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+                <div id="mobile-menu" class="hidden absolute top-full left-0 w-full bg-white/10 backdrop-filter backdrop-blur-lg border-t border-white/20 mt-2">
+                    <nav class="flex flex-col space-y-4 p极">
+                        <a href="{{ route('voyages') }}" class="text-gray-700 hover:text-indigo-600 font-medium">Voyages</a>
+                        <a href="{{ route('colis.index') }}" class="text-gray-700 hover:text-indigo-600 font-medium">Colis</a>
+                        <a href="{{ route('hebergements') }}" class="text-gray-700 hover:text-indigo-600 font-medium">Hébergements</a>
+                        @guest
+                            <a href="{{ route('login') }}" class="text-gray-700 hover:text-indigo-600 font-medium">Connexion</a>
+                            <a href="{{ route('register') }}" class="text-gray-700 hover:text-indigo-600 font-medium">Inscription</a>
+                        @endguest
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Réservez votre voyage en toute sérénité</h1>
+                <p class="hero-subtitle">Découvrez les meilleurs trajets entre la Guinée et le Sénégal</p>
+                
+                <!-- Improved Search Form -->
+                <form class="search-form liquid-glass" id="searchForm" method="GET">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Départ</label>
+                            <input type="text" name="depart" class="search-input" placeholder="Ex: Dakar" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Destination</label>
+                            <input type="text" name="destination" class="search-input" placeholder="Ex: Conakry" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Date</label>
+                            <input type="date" name="date" class="search-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Type de véhicule</label>
+                            <select name="vehicle_type" class="search-select" required>
+                                <option value="">Sélectionnez un type</option>
+                                <option value="bus">Bus</option>
+                                <option value="minicar">Mini-car</option>
+                                <option value="taxi">Taxi VIP</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-search">Rechercher</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <h2 class="section-title">Trajets disponibles</h2>
+            
+            <div class="trips-grid" id="tripsContainer">
+                <!-- Les trajets seront chargés dynamiquement ici -->
+            </div>
+            
+            <!-- Why Choose Us Section -->
+            <h2 class="section-title">Pourquoi choisir Ari Dioni ?</h2>
+            
+            <div class="features">
+                <div class="feature-card liquid-glass">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Sécurité garantie</h3>
+                    <p class="feature-description">Nos véhicules sont régulièrement inspectés et nos conducteurs rigoureusement sélectionnés.</p>
+                </div>
+                
+                <div class="feature-card liquid-glass">
+                    <div class="feature-icon">
+                        <i class="far fa-clock"></i>
+                    </div>
+                    <h3 class="feature-title">Ponctualité</h3>
+                    <p class="feature-description">Nous respectons scrupuleusement les horaires pour que vous arriviez toujours à temps.</p>
+                </div>
+                
+                <div class="feature-card liquid-glass">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3 class="feature-title">Support 24/7</h3>
+                    <p class="feature-description">Notre équipe est disponible 24h/24 et 7j/7 pour répondre à vos questions.</p>
+                </div>
+            </div>
+            
+            <!-- Testimonials Section -->
+            <h2 class="section-title">Ce que disent nos clients</h2>
+            
+            <div class="testimonials">
+                <div class="testimonial-card liquid-glass">
+                    <div class="testimonial-header">
+                        <div class="testimonial-avatar">
+                            <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Aissatou Diallo">
+                        </div>
+                        <div>
+                            <div class="testimonial-name">Aissatou Diallo</div>
+                            <div class="testimonial-rating">★★★★★</div>
+                        </div>
+                    </div>
+                    <p class="testimonial-text">"Service exceptionnel ! Le trajet était confortable et ponctuel. Je recommande vivement Ari Dioni pour tous vos déplacements."</p>
+                    
+                </div>
+                
+                <div class="testimonial-card liquid-glass">
+                    <div class="testimonial-header">
+                        <div class="testimonial-avatar">
+                            <img src="https://randomuser.me/api/portraits/men/45极jpg" alt="Mamadou Bah">
+                        </div>
+                        <div>
+                            <div class="testimonial-name">Mamadou Bah</div>
+                            <div class="testimonial-rating">★★★★★</div>
+                        </div>
+                    </div>
+                    <p class="testimonial-text">"J'ai été impressionné par le professionnalisme de l'équipe. Le bus était propre et climatisé. Excellent voyage!"</p>
+                </div>
+                
+                <div class="testimonial-card liquid-glass">
+                    <极 class="testimonial-header">
+                        <div class="testimonial-avatar">
+                            <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Fatoumata Binta">
+                        </div>
+                        <div>
+                            <div class="testimonial-name">Fatoumata Binta</div>
+                            <div class="testimonial-rating">★★★★☆</div>
+                        </div>
+                    </div>
+                    <p class="testimonial-text">"Service ponctuel et sécurisé. J'ai apprécié le suivi en temps réel de mon colis. Merci Ari Dioni!"</p>
+                    <p class="testimonial-text">"Service ponctuel et sécurisé. J'ai apprécié le suivi en temps réel de mon colis. Merci Ari Dioni!"</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="glass-footer relative overflow-hidden">
+        <!-- Effet de particules amélioré -->
+        <div class="absolute inset-0 overflow-hidden opacity-40">
+            <div class="particle" style="top: 10%; left: 5%; width: 8px; height: 8px; background: #4f46e5; animation-delay: 0s; animation-duration: 20s;"></div>
+            <div class="particle" style="top: 70%; left: 80%; width: 12px; height: 12px; background: #7c3aed; animation-delay: 3s; animation-duration: 18s;"></div>
+            <div class="particle" style="top: 25%; left: 65%; width: 6px; height: 6px; background: #818cf8; animation-delay: 5s; animation-duration: 22s;"></div>
+            <div class="particle" style="top: 85%; left: 25%; width: 10px; height: 10px; background: #4f46e5; animation-delay: 2s; animation-duration: 17s;"></div>
+            <div class="particle" style="top: 50%; left: 50%; width: 7px; height: 7px; background: #7c3aed; animation-delay: 4s; animation-duration: 25s;"></div>
+            <div class="particle" style="top: 35%; left: 15%; width: 9px; height: 9px; background: #818cf8; animation-delay: 1s; animation-duration: 19s;"></div>
+        </div>
+
+        <div class="container mx-auto px-4 py-16 relative z-10">
+            <!-- Contenu principal en 4 colonnes -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                <!-- Colonne Logo + Description -->
+                <div>
+                    <div class="footer-logo" style="background: white; padding: 10px;">
+                        <span class="footer-logo-text" style="
+                             background: linear-gradient(90deg, #333333, #555555, #777777);
+                             -webkit-background-clip: text;
+                             -webkit-text-fill-color: transparent;
+                             font-weight: bold;
+                             font-size: 1.25rem;
+                                                ">
+                            ARI DIONI
+                        </span>
+                        <img src="{{ asset('images/logo.png') }}" alt="Ari Dioni" class="h-12 w-12 object-contain">
+                    </div>
+                    <p class="text-gray-400 mb-6 leading-relaxed">
+                        Réinventons ensemble votre expérience de voyage et de logistique en Afrique de l'Ouest.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="https://web.facebook.com/profile.php?id=61581020729640" class="social-icon" aria-label="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a> 
+                        <a href="#" class="social-icon" aria-label="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://x.com/AraiDioni" class="social-icon" aria-label="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a> 
+                        <a href="https://www.linkedin.com/feed/?trk=onboarding-landing" class="social-icon" aria-label="LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Colonne Liens rapides -->
+                <div>
+                    <h3 class="text-xl font-semibold text-white mb-6 pb-2 relative inline-block border-b-2 border-indigo-500">Navigation</h3>
+                    <ul class="space-y-3">
+                        <li><a href="{{ route('home') }}" class="footer-link"><span>Accueil</span><i class="fas fa-chevron-right text-xs ml-2 opacity-0 transition-all"></i></a></li>
+                        <li><a href="{{ route('voyages') }}" class="footer-link"><span>Voyages</span><i class="fas fa-chevron-right text-xs ml-2 opacity-0 transition-all"></i></a></li>
+                        <li><a href="{{ route('colis.index') }}" class="footer-link"><span>Envoi de colis</span><i class="fas fa-chevron-right text-xs ml-2 opacity-0 transition-all"></i></a></li>
+                        <li><a href="{{ route('hebergements') }}" class="footer-link"><span>Hébergements</span><i class="fas fa-chevron-right text-xs ml-2 opacity-0 transition-all"></i></a></li>
+                        <li><a href="{{ route('about') }}" class="footer-link"><span>À propos</span><i class="fas fa-chevron-right text-xs ml-2 opacity-0 transition-all"></i></a></li>
+                        <li><a href="{{ route('contact') }}" class="footer-link"><span>Contact</span><i class="fas fa-chevron-right text-xs ml-2 opacity-0 transition-all"></i></a></li>
+                    </ul>
+                </div>
+
+                <!-- Colonne Contact -->
+                <div>
+                    <h3 class="text-xl font-semibold text-white mb-6 pb-2 relative inline-block border-b-2 border-indigo-500">Nous contacter</h3>
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Medina, Dakar, Sénégal</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone-alt"></i>
+                        <a href="tel:+2217784449333">+221 77 844 93 33</a>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <a href="mailto:contact@aridioni.com">contactaridioni@gmail.com</a>
+                    </div>
+
+                    <!-- Bouton CTA -->
+                    <button class="quote-btn w-full mt-6 text-white font-medium py-3 px-4 rounded-lg">
+                        Demander un devis
+                    </button>
+                </div>
+
+                <!-- Newsletter -->
+                <div>
+                    <h3 class="text-xl font-semibold text-white mb-6 pb-2 relative inline-block border-b-2 border-indigo-500">Newsletter</h3>
+                    <div class="mb-4">
+                        <input type="email" placeholder="Votre email" class="newsletter-input w-full px-4 py-3 rounded-lg mb-3">
+                        <button class="newsletter-btn w-full text-white font-medium py-3 px-4 rounded-lg">S'abonner</button>
+                    </div>
+                    <p class="text-gray-500 text-sm">
+                        Nous ne partagerons jamais votre email.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Section moyens de paiement -->
+            <div class="py-8 border-t border-gray-800">
+                <h3 class="text-lg font-semibold text-center mb-8 text-white">Moyens de paiement acceptés</h3>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <div class="payment-method">
+                        <img src="{{ asset('images/payments/orange-money.png') }}" alt="Orange Money" class="h-8" loading="lazy">
+                    </div>
+                    <div class="payment-method">
+                        <img src="{{ asset('images/payments/momo.png') }}" alt="MTN Mobile Money" class="h-8" loading="lazy">
+                    </div>
+                    <div class="payment-method">
+                        <img src="{{ asset('images/payments/visa.png') }}" alt="Visa" class="h-8" loading="lazy">
+                    </div>
+                    <div class="payment-method">
+                        <img src="{{ asset('images/payments/mastercard.png') }}" alt="Mastercard" class="h-8" loading="lazy">
+                    </div>
+                    <div class="payment-method">
+                        <img src="{{ asset('images/payments/cash.png') }}" alt="Espèces" class="h-8" loading="lazy">
+                    </div>
+                    <div class="payment-method">
+                        <img src="{{ asset('images/payments/paypal.png') }}" alt="PayPal" class="h-8" loading="lazy">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="text-center pt-8 border-t border-gray-800">
+                <p class="text-gray-500 text-sm">
+                    &copy; {{ date('Y') }} Ari Dioni. Tous droits réservés.
+                </p>
+            </div>
+        </div>
+
+        <!-- Effet de vague amélioré -->
+        <div class="wave-container">
+            <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" class="wave-fill"></path>
+                <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" class="wave-fill"></path>
+                <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" class="wave-fill"></path>
+            </svg>
+        </div>
+    </footer>
+
+    <!-- Seat Selection Modal -->
+    <div class="modal" id="seatModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Sélection des sièges</h2>
+                <button class="modal-close" onclick="closeSeatSelection()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="seat-layout">
+                    <div class="seat-legend">
+                        <div class="legend-item">
+                            <div class="legend-color legend-available"></div>
+                            <span>Disponible</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color legend-reserved"></div>
+                            <span>Réservé</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color legend-selected"></div>
+                            <span>Votre choix</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color legend-driver"></div>
+                            <span>Conducteur</span>
+                        </div>
+                    </div>
+                    
+                    <div id="busLayout" class="bus-layout" style="display: none;">
+                        <!-- Driver seat -->
+                        <div class="seat seat-driver">D</div>
+                        <div class="aisle"></div>
+                        <div class="aisle"></div>
+                        <div class="aisle"></div>
+                        <div class="aisle"></div>
+                        
+                        <!-- Rows 1-12: 4 seats per row (2+2 with aisle) -->
+                        <!-- Generated with JavaScript for brevity -->
+                    </div>
+                    
+                    <div id="minicarLayout" class="minicar-layout" style="display: none;">
+                        <!-- Driver seat -->
+                        <div class="seat seat-driver">D</div>
+                        <div class="aisle"></div>
+                        <div class="seat seat-available" onclick="toggleSeat(this, '1')">1</div>
+                        <div class="seat seat-available" onclick="toggleSeat(this, '2')">2</div>
+                        
+                        <!-- Row 1 -->
+                        <div class="seat seat-available" onclick="toggleSeat(this, '3')">3</div>
+                        <div class="seat seat-available" onclick="toggleSeat(this, '4')">4</div>
+                        <div class="seat seat-available" onclick="toggleSeat(this, '5')">5</div>
+                        <div class="seat seat-available" onclick="toggleSeat(this, '6')">6</div>
+                        
+                        <!-- Row 2 -->
+                        <div class="seat seat-available" onclick="toggleSeat(this, '7')">7</div>
+                        <div class="seat seat-available" onclick="toggleSeat(this, '8')">8</div>
+                        <div class="seat seat-available" onclick="toggleSeat(this, '9')">9</div>
+                        <div class="seat seat-available" onclick="toggleSeat(this, '10')">10</div>
+                        
+                        <!-- Row 3 -->
+                        <div class="seat seat-available" onclick="toggleSeat(this, '11')">11</div>
+                        <div class="seat seat-available" onclick="toggleSeat(this, '12')">12</div>
+                        <div class="seat seat-available" onclick="toggleSeat(this, '13')">13</div>
+                        <div class="seat seat-available" onclick="toggleSeat(this, '14')">14</div>
+                    </div>
+                    
+                    <div id="taxiLayout" class="taxi-layout" style="display: none;">
+                        <!-- Driver seat -->
+                        <div class="seat seat-driver">D</div>
+                        <div class="aisle"></div>
+                        <div class="seat seat-available" onclick="toggleSeat(this, '1')">1</div>
+                        
+                        <!-- Row 1 -->
+                        <div class="seat seat-available" onclick="toggleSeat(this, '2')">2</div>
+                        <div class="seat seat-available" onclick="toggleSeat(this, '3')">3</div>
+                        <div class="seat seat-available" onclick="toggleSeat(this, '4')">4</div>
+                        
+                        <!-- Row 2 -->
+                        <div class="seat seat-available" onclick="toggleSeat(this, '5')">5</div>
+                        <div class="aisle"></div>
+                        <div class="seat seat-available" onclick="toggleSeat(this, '6')">6</div>
+                    </div>
+                </div>
+                
+                <div class="selected-seats" id="selectedSeats">
+                    Aucun siège sélectionné
+                </div>
+                
+                <div class="modal-footer">
+                    <button class="btn btn-outline" onclick="closeSeatSelection()">Annuler</button>
+                    <button class="btn btn-primary" onclick="confirmReservation()">Confirmer la réservation</button>
+                </div>
+            </div>
+        </div>
+    </div>
 <script>
     // Configuration et état global
     const CONFIG = {
@@ -1983,45 +2410,142 @@
     }
 
     // Réservation
-    async function confirmReservation() {
+async function confirmReservation() {
     if (APP_STATE.selectedSeats.length === 0) {
         alert('Veuillez sélectionner au moins un siège.');
         return;
     }
 
+    // Si l'utilisateur n'est pas connecté, afficher un formulaire modal
+    if (!isUserAuthenticated()) {
+        showReservationForm();
+        return;
+    }
+
+    await processReservation();
+}
+
+function isUserAuthenticated() {
+    // Vérifier si l'utilisateur est connecté
+    // Vous pouvez utiliser une variable globale ou vérifier la présence d'un token
+    return window.userAuthenticated || false;
+}
+
+function showReservationForm() {
+    const modalHTML = `
+        <div class="modal" id="reservationFormModal" style="display: flex;">
+            <div class="modal-content" style="max-width: 500px;">
+                <div class="modal-header">
+                    <h2 class="modal-title">Informations de réservation</h2>
+                    <button class="modal-close" onclick="closeReservationForm()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-4">Veuillez remplir vos informations pour compléter la réservation.</p>
+                    
+                    <form id="guestReservationForm">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Nom complet *</label>
+                                <input type="text" name="nom" required 
+                                       class="w-full px-3 py-2 border rounded-lg" 
+                                       placeholder="Votre nom complet">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Email *</label>
+                                <input type="email" name="email" required 
+                                       class="w-full px-3 py-2 border rounded-lg"
+                                       placeholder="votre@email.com">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Téléphone *</label>
+                                <input type="tel" name="telephone" required 
+                                       class="w-full px-3 py-2 border rounded-lg"
+                                       placeholder="+221 XX XXX XX XX">
+                            </div>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline" onclick="closeReservationForm()">
+                                Annuler
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                Confirmer la réservation
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Ajouter le modal au body
+    const modalContainer = document.createElement('div');
+    modalContainer.innerHTML = modalHTML;
+    document.body.appendChild(modalContainer);
+
+    // Gérer la soumission du formulaire
+    document.getElementById('guestReservationForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        await processGuestReservation(this);
+    });
+}
+
+function closeReservationForm() {
+    const modal = document.getElementById('reservationFormModal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+async function processGuestReservation(form) {
+    const formData = new FormData(form);
+    const guestInfo = {
+        nom: formData.get('nom'),
+        email: formData.get('email'),
+        telephone: formData.get('telephone')
+    };
+
+    await processReservation(guestInfo);
+}
+
+async function processReservation(guestInfo = null) {
     try {
-        // Récupérer le token CSRF
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
         
         if (!csrfToken) {
             throw new Error('Token CSRF non trouvé');
         }
 
-        const response = await fetch(CONFIG.apiEndpoints.reservation, {
+        const reservationData = {
+            voyage_id: APP_STATE.currentTripId,
+            seats: APP_STATE.selectedSeats
+        };
+
+        // Ajouter les informations client si fournies (pour non authentifiés)
+        if (guestInfo) {
+            Object.assign(reservationData, guestInfo);
+        }
+
+        // Utiliser l'endpoint unifié
+        const response = await fetch('/api/reservations/unified', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': csrfToken,
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({
-                voyage_id: APP_STATE.currentTripId,
-                sieges: APP_STATE.selectedSeats
-            })
+            body: JSON.stringify(reservationData)
         });
 
-        // Nettoyer la réponse des commentaires //
-        const responseText = await response.text();
-        let cleanedResponse = responseText.trim();
-        if (cleanedResponse.startsWith('//')) {
-            cleanedResponse = cleanedResponse.substring(cleanedResponse.indexOf('\n') + 1);
-        }
-        
-        const result = JSON.parse(cleanedResponse);
+        const result = await response.json();
 
         if (result.success) {
             alert(`Réservation confirmée! Sièges: ${APP_STATE.selectedSeats.join(', ')}`);
             closeSeatSelection();
+            closeReservationForm();
+            
             if (result.reservation_id) {
                 window.location.href = `/ticket/${result.reservation_id}`;
             }
@@ -2032,7 +2556,7 @@
         console.error("Error saving reservation:", error);
         alert("Une erreur s'est produite lors de la réservation. Veuillez réessayer.");
     }
-    }
+}
 
     // Fermeture modale
     if (DOM_ELEMENTS.seatModal) {
@@ -2056,4 +2580,8 @@
     window.closeSeatSelection = closeSeatSelection;
     window.confirmReservation = confirmReservation;
 </script>
-@endsection
+ 
+
+
+</body>
+</html>

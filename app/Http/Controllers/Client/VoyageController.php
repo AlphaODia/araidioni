@@ -19,7 +19,7 @@ class VoyageController extends Controller
         try {
             $firebase = (new Factory)
                 ->withServiceAccount(base_path('firebase-credentials.json'))
-                ->withDatabaseUri("https://arai-dioni-1b65f-default-rtdb.firebaseio.com/");
+                ->withDatabaseUri("https://araidioni-default-rtdb.firebaseio.com/");
 
             $this->database = $firebase->createDatabase();
         } catch (\Exception $e) {
@@ -29,13 +29,17 @@ class VoyageController extends Controller
 
     public function index(Request $request)
     {
+        // AJOUT : Récupération des avis depuis Firebase
+        $avis = $this->getAvisFromFirebase();
+
         if ($request->ajax()) {
             return $this->searchTrips($request);
         }
 
         return view('client.voyages', [
             'trajets' => [],
-            'searchParams' => $request->all()
+            'searchParams' => $request->all(),
+            'avis' => collect($avis) // ← AJOUT IMPORTANT ICI
         ]);
     }
 
@@ -387,6 +391,34 @@ class VoyageController extends Controller
         }
     }
 
+
+        /**
+     * Récupère les avis depuis Firebase Realtime Database
+     */
+    private function getAvisFromFirebase()
+    {
+    try {
+        $firebase = app('firebase.database');
+        $reference = $firebase->getReference('demandes_avis')
+            ->orderByKey()
+            ->limitToFirst(10);
+        
+        $snapshot = $reference->getSnapshot();
+        $data = $snapshot->getValue();
+        
+        Log::info('Données récupérées avec le package Firebase : ' . ($data ? count($data) : 0));
+        
+        if ($data && is_array($data)) {
+            return array_values($data);
+        }
+        
+        return [];
+        
+    } catch (\Exception $e) {
+        Log::error('Erreur package Firebase: ' . $e->getMessage());
+        return [];  
+    }
+    }
     /**
      * Extrait les sièges au format Application (string)
      */
@@ -437,7 +469,7 @@ class VoyageController extends Controller
     }
 
     /**
-     * MÉTHODE DE RÉSERVATION PRINCIPALE - CORRIGÉE
+     * MÉTHODE DE RÉSERVATION PRINCIPALE - SÉCURISÉE
      */
     public function reserver(Request $request)
     {
@@ -448,10 +480,9 @@ class VoyageController extends Controller
                 'seats.*' => 'string',
                 'nom' => 'required|string|max:255',
                 'email' => 'required|email',
-                'telephone' => 'required|string|max:20',
-                'user_id' => 'sometimes|string' // Pour la compatibilité avec l'app
+                'telephone' => 'required|string|max:20'
             ]);
-
+        
             // Vérifier si les sièges sont disponibles
             $voyageRef = $this->database->getReference('search/' . $validated['voyage_id']);
             $voyageSnapshot = $voyageRef->getSnapshot();
@@ -466,9 +497,8 @@ class VoyageController extends Controller
             $voyage = $voyageSnapshot->getValue();
             $normalizedTrip = $this->normalizeTripData($voyage);
             
-            // Vérification des sièges réservés (format application)
+            // Vérification des sièges réservés
             $reservedSeats = $this->getReservedSeatsForApp($normalizedTrip, $validated['voyage_id']);
-            
             $requestedSeats = $validated['seats'];
             $alreadyReserved = array_intersect($requestedSeats, $reservedSeats);
             
@@ -478,56 +508,43 @@ class VoyageController extends Controller
                     'message' => 'Certains sièges sont déjà réservés: ' . implode(', ', $alreadyReserved)
                 ], 400);
             }
-
-            // FORMAT APPLICATION : seats en string séparée par des virgules
-            $seatsString = is_array($validated['seats']) ? implode(',', $validated['seats']) : $validated['seats'];
-
-            // Créer la réservation avec le FORMAT APPLICATION
+        
+            // ✅ CRÉER LA RÉSERVATION AVEC STATUT "EN ATTENTE DE PAIEMENT"
+            $seatsString = implode(',', $validated['seats']);
+            
             $reservationData = [
-                'voyage_id' => $validated['voyage_id'], // Comme dans l'app
-                'seats' => $seatsString, // FORMAT APP: "26" ou "26,27"
-                'status' => 'confirmé',
-                'created_at' => now()->timestamp * 1000, // Format timestamp
-                
-                // Clé de voyage comme dans l'app
-                'voyage_key' => $validated['voyage_id'], // Utilise l'ID du voyage comme dans l'app
-                
-                // Informations du voyage
+                'voyage_id' => $validated['voyage_id'],
+                'seats' => $seatsString,
+                'status' => 'en_attente', // ✅ Pas "confirmé" tant que pas payé
+                'payment_status' => 'pending', // ✅ Nouveau champ
+                'created_at' => now()->timestamp,
+                'voyage_key' => $validated['voyage_id'],
                 'departure' => $normalizedTrip['departure'],
                 'arrival' => $normalizedTrip['arrival'],
                 'date' => $normalizedTrip['date'],
                 'time' => $normalizedTrip['departure_time'],
                 'price' => $normalizedTrip['price'],
-                'vehicle_type' => $normalizedTrip['vehicle_type']
+                'vehicle_type' => $normalizedTrip['vehicle_type'],
+                'nom' => $validated['nom'],
+                'email' => $validated['email'],
+                'telephone' => $validated['telephone']
             ];
-            
-            // Informations client
-            $reservationData['nom'] = $validated['nom'];
-            $reservationData['email'] = $validated['email'];
-            $reservationData['telephone'] = $validated['telephone'];
-            
-            // Gestion user_id (comme dans l'app)
-            if (isset($validated['user_id'])) {
-                $reservationData['user_id'] = $validated['user_id'];
-            } elseif (Auth::check()) {
-                $reservationData['user_id'] = Auth::id();
-            }
-
-            // Sauvegarder dans Firebase
+        
+            // Sauvegarder la réservation
             $reservationsRef = $this->database->getReference('reservations');
             $newReservation = $reservationsRef->push($reservationData);
             $reservationId = $newReservation->getKey();
-
-            // Ajouter l'ID de réservation (comme dans l'app)
+        
+            // Ajouter l'ID
             $this->database->getReference('reservations/' . $reservationId . '/reservation_id')
                 ->set($reservationId);
-
-            // Rediriger vers la page du ticket après réservation
+        
+            // ✅ RETOURNER L'ID DE RÉSERVATION POUR LE PAIEMENT
             return response()->json([
                 'success' => true, 
                 'reservation_id' => $reservationId,
-                'redirect_url' => url("/ticket/{$reservationId}"),
-                'message' => 'Réservation effectuée avec succès'
+                'message' => 'Réservation créée. Veuillez procéder au paiement.',
+                'payment_required' => true // ✅ Indiquer que le paiement est requis
             ]);
             
         } catch (\Exception $e) {
@@ -845,5 +862,7 @@ public function createReservationUnified(Request $request)
                 'error' => $e->getMessage()
             ], 500);
         }
+
+        
     }
 }

@@ -2,56 +2,58 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Kreait\Laravel\Firebase\Facades\Firebase;
-use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class Newsletter extends Model
 {
-    use HasFactory;
-
-    protected $fillable = ['email', 'subscribed_at', 'status'];
-
-    /**
-     * Sauvegarder un email dans Firebase
-     */
-    public static function saveToFirebase($email)
-    {
-        try {
-            $database = Firebase::database();
-            $newsletterRef = $database->getReference('newsletter_subscribers');
-            
-            $newSubscriber = $newsletterRef->push([
-                'email' => $email,
-                'subscribed_at' => date('Y-m-d H:i:s'),
-                'status' => 'active',
-                'created_at' => time()
-            ]);
-
-            return $newSubscriber->getKey();
-        } catch (\Exception $e) {
-            Log::error('Erreur sauvegarde Firebase: '.$e->getMessage());
-            return false;
-        }
-    }
-
-    /**
-     * Vérifier si l'email existe déjà
-     */
+    protected $fillable = ['email'];
+    
     public static function checkEmailExists($email)
     {
         try {
             $database = Firebase::database();
-            $newsletterRef = $database->getReference('newsletter_subscribers')
+            $subscribersRef = $database->getReference('newsletter_subscribers')
                 ->orderByChild('email')
                 ->equalTo($email)
                 ->getSnapshot();
-
-            return $newsletterRef->exists();
+            
+            return $subscribersRef->exists() && count($subscribersRef->getValue()) > 0;
         } catch (\Exception $e) {
-            Log::error('Erreur vérification email: '.$e->getMessage());
             return false;
+        }
+    }
+    
+    public static function saveToFirebase($email)
+    {
+        try {
+            $database = Firebase::database();
+            $subscribersRef = $database->getReference('newsletter_subscribers');
+            
+            $newSubscriberRef = $subscribersRef->push([
+                'email' => $email,
+                'created_at' => Carbon::now()->toDateTimeString(),
+                'status' => 'active'
+            ]);
+            
+            return $newSubscriberRef->getKey();
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+    
+    public static function getAllFromFirebase()
+    {
+        try {
+            $database = Firebase::database();
+            $subscribersRef = $database->getReference('newsletter_subscribers')
+                ->orderByChild('created_at')
+                ->getSnapshot();
+            
+            return $subscribersRef->exists() ? $subscribersRef->getValue() : [];
+        } catch (\Exception $e) {
+            return [];
         }
     }
 }

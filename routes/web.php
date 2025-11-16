@@ -14,11 +14,10 @@ use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\HebergementTicketController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\AvisController;
+use App\Http\Controllers\Client\PaymentController;
 
 // Routes publiques
-Route::get('/', function () {
-    return view('client.home');
-})->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Routes pour les voyages
 Route::get('/voyages', [VoyageController::class, 'index'])->name('voyages');
@@ -29,12 +28,10 @@ Route::post('/reserver', [VoyageController::class, 'reserver'])->name('voyages.r
 Route::get('/ticket/{reservationId}', [VoyageController::class, 'ticket'])->name('voyages.ticket');
 Route::get('/mes-reservations', [VoyageController::class, 'mesReservations'])->name('voyages.mes-reservations');
 Route::post('/annuler-reservation/{reservationId}', [VoyageController::class, 'annulerReservation'])->name('voyages.annuler');
-// Route pour le formulaire de réservation
-Route::get('/reservation/{voyageId}', [VoyageController::class, 'showReservationForm'])
-    ->name('reservation.form');
-        Route::get('/voyages/convert-to-app', [VoyageController::class, 'convertToAppFormat']);
 
-Route::get('/api/voyages/{voyageId}/sieges', [VoyageController::class, 'getSiegesReserves']);
+// Route pour le formulaire de réservation
+Route::get('/reservation/{voyageId}', [VoyageController::class, 'showReservationForm'])->name('reservation.form');
+Route::get('/voyages/convert-to-app', [VoyageController::class, 'convertToAppFormat']);
 
 // Routes API pour les voyages
 Route::get('/api/voyages', [VoyageController::class, 'apiIndex'])->name('voyages.api');
@@ -44,8 +41,6 @@ Route::post('/api/reserver', [VoyageController::class, 'reserver'])->name('voyag
 // Route de debug Firebase
 Route::get('/debug-firebase', [VoyageController::class, 'debugTrips']);
 
-
-
 // Routes pour les hébergements
 Route::get('/hebergements', [HebergementController::class, 'index'])->name('hebergements');
 Route::post('/hebergements/reserver', [HebergementController::class, 'reserver'])->name('hebergements.reserver');
@@ -53,12 +48,15 @@ Route::get('/api/hebergements', [HebergementController::class, 'apiHebergements'
 Route::get('/hebergements/{id}', [HebergementController::class, 'show'])->name('hebergements.show');
 
 // Route pour le ticket d'hébergement
-Route::get('/hebergement/ticket/{reservationId}', [HebergementTicketController::class, 'show'])
-    ->name('hebergement.ticket');
+Route::get('/hebergement/ticket/{reservationId}', [HebergementTicketController::class, 'show'])->name('hebergement.ticket');
 
 // Routes informations
 Route::get('/a-propos', [HomeController::class, 'about'])->name('about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
+
+// Routes pour les témoignages
+Route::get('/temoignages', [HomeController::class, 'temoignages'])->name('temoignages');
+Route::post('/temoignages', [HomeController::class, 'storeTemoignage'])->name('temoignages.store');
 
 // Routes pour les colis
 Route::prefix('colis')->name('colis.')->group(function () {
@@ -69,6 +67,34 @@ Route::prefix('colis')->name('colis.')->group(function () {
     Route::post('/track', [ColisController::class, 'search'])->name('search');
     Route::get('/{id}', [ColisController::class, 'show'])->name('show');
 });
+
+// ==================== ROUTES DE PAIEMENT ====================
+Route::prefix('payment')->group(function () {
+    Route::get('/test', [PaymentController::class, 'testConnection'])->name('payment.test'); // AJOUTÉ
+    Route::post('/initiate', [PaymentController::class, 'initPayment'])->name('payment.initiate');
+    Route::get('/success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
+    Route::get('/cancel', [PaymentController::class, 'paymentCancel'])->name('payment.cancel');
+    Route::post('/webhook', [PaymentController::class, 'paymentWebhook'])->name('payment.webhook');
+    Route::get('/status/{paymentId}', [PaymentController::class, 'checkPaymentStatus'])->name('payment.status');
+
+    Route::get('/payment/test-connection', [PaymentController::class, 'testPaydunyaConnection'])
+    ->name('payment.test.connection');
+    });
+// ==================== FIN ROUTES PAIEMENT ====================
+
+// Routes de recherche
+Route::post('/rechercher-voyages', [VoyageController::class, 'search'])->name('voyages.search');
+
+// Routes pour la newsletter
+Route::get('/newsletter/inscription', [NewsletterController::class, 'showForm'])->name('newsletter.form');
+Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+Route::get('/newsletter/subscribers', [NewsletterController::class, 'getSubscribers'])->name('newsletter.subscribers')->middleware('auth');
+
+// Routes pour les avis
+Route::get('/avis/public', [AvisController::class, 'showApproved'])->name('avis.public');
+Route::get('/avis', [AvisController::class, 'create'])->name('avis.create');
+Route::post('/avis', [AvisController::class, 'store'])->name('avis.store');
+Route::get('/avis/approved', [AvisController::class, 'getApprovedAvis'])->name('avis.approved');
 
 // Routes de dashboard par rôle
 Route::prefix('client')->name('client.')->middleware(['auth', 'role:client'])->group(function() {
@@ -114,16 +140,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('audit', [DashboardController::class, 'audit'])->name('audit');
 });
 
-// Routes de recherche
-Route::post('/rechercher-voyages', [VoyageController::class, 'search'])->name('voyages.search');
-
-// Routes pour la newsletter
-Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
-Route::get('/newsletter/subscribers', [NewsletterController::class, 'getSubscribers'])->name('newsletter.subscribers')->middleware('auth');
-
-// Routes pour les avis
-Route::post('/avis/store', [AvisController::class, 'store'])->name('avis.store');
-Route::get('/avis', [AvisController::class, 'index'])->name('avis.index')->middleware('auth');
-Route::get('/avis/approved', [AvisController::class, 'getApprovedAvis'])->name('avis.approved');
+// Routes Admin supplémentaires
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/newsletter', [NewsletterController::class, 'getSubscribers'])->name('admin.newsletter');
+    Route::get('/admin/avis', [AvisController::class, 'index'])->name('admin.avis');
+    Route::post('/admin/avis/{avisId}/approve', [AvisController::class, 'approve'])->name('admin.avis.approve');
+});
 
 require __DIR__.'/auth.php';
+require __DIR__.'/payment.php';

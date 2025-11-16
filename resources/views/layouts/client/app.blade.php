@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ari Dioni - @yield('title')</title>
+    <title>Ari Dioni - @yield('title', 'Accueil')</title>
     
     <!-- Styles -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -13,16 +13,13 @@
     <!-- Liquid Glass CSS -->
     <link rel="stylesheet" href="{{ asset('css/liquid-glass.css') }}">
     
-    <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    
     <style>
         body {
             font-family: 'Poppins', sans-serif;
             transition: all 0.5s ease;
         }
         
-        /* Styles Bootstrap pour la compatibilité */
+        /* Styles pour la compatibilité */
         .container {
             width: 100%;
             padding-right: 15px;
@@ -58,10 +55,10 @@
     
     @yield('styles')
 </head>
-<body class="bg-gray-50 @if(request()->is('colis/track')) no-glass-effect @endif" id="main-body">
+<body class="bg-gray-50 @if(request()->is('colis/track')) no-liquid-glass @endif" id="main-body">
     @include('layouts.client.header')
 
-    <main class="min-h-screen" id="main-content" style="padding-top: 100px;">
+    <main class="min-h-screen" id="main-content">
         @yield('content')
     </main>
 
@@ -70,7 +67,7 @@
     <!-- Liquid Glass JavaScript -->
     <script src="{{ asset('js/liquid-glass.js') }}"></script>
     
-    <!-- Scripts -->
+    <!-- Scripts personnalisés -->
     @stack('scripts')
 </body>
 </html>

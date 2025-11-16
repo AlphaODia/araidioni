@@ -60,7 +60,7 @@
                             </div>
                             <div>
                                 <p class="text-sm text-gray-500">Prix total</p>
-                                <p class="font-bold text-blue-600">{{ isset($colis['prix']) ? number_format($colis['prix'], 0, ',', ' ') : 'N/A' }} GNF</p>
+                                <p class="font-bold text-blue-600">{{ isset($colis['prix']) ? number_format($colis['prix'], 0, ',', ' ') : 'N/A' }} CFA</p>
                             </div>
                         </div>
                     </div>

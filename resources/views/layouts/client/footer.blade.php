@@ -40,16 +40,23 @@
                     // CORRECTION: Utilisation correcte du token CSRF
                     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
                     
-                    fetch('/newsletter/subscribe', {
+                    // CORRECTION: Utilisation de la route correcte
+                    fetch("{{ route('newsletter.subscribe') }}", {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': csrfToken,
-                            'X-Requested-With': 'XMLHttpRequest'
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
                         },
                         body: JSON.stringify({ email: email })
                     })
                     .then(response => {
+                        if (response.status === 422) {
+                            return response.json().then(data => {
+                                throw new Error(data.message || 'Erreur de validation');
+                            });
+                        }
                         if (!response.ok) {
                             throw new Error('Erreur réseau');
                         }
@@ -65,7 +72,7 @@
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Erreur de connexion au serveur');
+                        alert(error.message || 'Erreur de connexion au serveur');
                     })
                     .finally(() => {
                         newsletterBtn.disabled = false;
@@ -133,6 +140,7 @@
                                             <option value="voyage">Voyage</option>
                                             <option value="colis">Envoi de colis</option>
                                             <option value="hebergement">Hébergement</option>
+                                            <option value="transfert">Transfert d'argent</option>
                                         </select>
                                     </div>
                                     
@@ -147,7 +155,6 @@
                                         <label class="block mb-2 font-medium ${LIQUID_GLASS_ENABLED ? 'text-white' : 'text-gray-700'}">Note (optionnelle)</label>
                                         <select name="rating" 
                                                 class="${inputClass} ${LIQUID_GLASS_ENABLED ? '' : 'border-gray-300'}">
-                                            <option value="">Sélectionnez une note</option>
                                             <option value="5">⭐️⭐️⭐️⭐️⭐️ Excellente</option>
                                             <option value="4">⭐️⭐️⭐️⭐️ Très bonne</option>
                                             <option value="3">⭐️⭐️⭐️ Moyenne</option>
@@ -188,41 +195,57 @@
                 };
             }
             
-            function submitAvisForm(form) {
-                const formData = new FormData(form);
-                const data = Object.fromEntries(formData.entries());
-                
-                // CORRECTION: Utilisation correcte du token CSRF
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-                
-                fetch('/avis/store', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify(data)
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Erreur réseau');
-                    }
-                    return response.json();
-                })
-                .then(result => {
-                    if (result.success) {
-                        alert('Merci pour votre avis ! Nous vous contacterons rapidement.');
-                        window.closeModal();
-                    } else {
-                        alert(result.message || 'Erreur lors de l\'envoi');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Erreur de connexion au serveur');
-                });
-            }
+function submitAvisForm(form) {
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+    
+    // CORRECTION: Utilisation correcte du token CSRF
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    
+    // CORRECTION: Utilisation de la route correcte
+    fetch("{{ route('avis.store') }}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (response.status === 422) {
+            return response.json().then(data => {
+                // AFFICHER LES ERREURS DÉTAILLÉES
+                if (data.errors) {
+                    const errorMessages = Object.values(data.errors).flat().join('\n');
+                    alert('Erreurs de validation:\n' + errorMessages);
+                } else {
+                    alert(data.message || 'Veuillez corriger les erreurs du formulaire');
+                }
+                throw new Error('Validation failed');
+            });
+        }
+        if (!response.ok) {
+            throw new Error('Erreur réseau');
+        }
+        return response.json();
+    })
+    .then(result => {
+        if (result.success) {
+            alert('Merci pour votre avis ! Nous vous contacterons rapidement.');
+            window.closeModal();
+        } else {
+            alert(result.message || 'Erreur lors de l\'envoi');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        if (error.message !== 'Validation failed') {
+            alert('Erreur de connexion au serveur');
+        }
+    });
+}
         });
     </script>
     <style>
@@ -566,7 +589,7 @@
 
                     <!-- Bouton CTA -->
                     <button class="quote-btn w-full mt-6 text-white font-medium py-3 px-4 rounded-lg">
-                        Demander un devis
+                        Demander un devis / Avis
                     </button>
                 </div>
 
