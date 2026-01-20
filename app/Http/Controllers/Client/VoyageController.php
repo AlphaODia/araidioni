@@ -19,7 +19,7 @@ class VoyageController extends Controller
         try {
             $firebase = (new Factory)
                 ->withServiceAccount(base_path('firebase-credentials.json'))
-                ->withDatabaseUri("https://araidioni-default-rtdb.firebaseio.com/");
+                ->withDatabaseUri("https://araidioni-a7186-default-rtdb.firebaseio.com");
 
             $this->database = $firebase->createDatabase();
         } catch (\Exception $e) {
@@ -29,6 +29,7 @@ class VoyageController extends Controller
 
     public function index(Request $request)
     {
+
         // AJOUT : Récupération des avis depuis Firebase
         $avis = $this->getAvisFromFirebase();
 
@@ -473,6 +474,7 @@ class VoyageController extends Controller
      */
     public function reserver(Request $request)
     {
+    
         try {
             $validated = $request->validate([
                 'voyage_id' => 'required|string',
@@ -811,6 +813,7 @@ public function createReservationUnified(Request $request)
      */
     public function convertToAppFormat()
     {
+        
         try {
             Log::info('Début de la conversion au format application');
             

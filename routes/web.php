@@ -147,5 +147,22 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/admin/avis/{avisId}/approve', [AvisController::class, 'approve'])->name('admin.avis.approve');
 });
 
+
+// ==================== ROUTES DE PAIEMENT ====================
+Route::prefix('payment')->group(function () {
+    Route::get('/test', [PaymentController::class, 'testConnection'])->name('payment.test');
+    Route::get('/test-connection', [PaymentController::class, 'testPaydunyaConnection'])->name('payment.test.connection');
+    Route::get('/network-diagnostic', [PaymentController::class, 'networkDiagnostic'])->name('payment.network.diagnostic');
+    Route::post('/initiate', [PaymentController::class, 'initPayment'])->name('payment.initiate');
+    Route::post('/fallback', [PaymentController::class, 'fallbackPayment'])->name('payment.fallback');
+    Route::get('/success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
+    Route::get('/cancel', [PaymentController::class, 'paymentCancel'])->name('payment.cancel');
+    Route::post('/webhook', [PaymentController::class, 'paymentWebhook'])->name('payment.webhook');
+    Route::get('/status/{paymentId}', [PaymentController::class, 'checkPaymentStatus'])->name('payment.status');
+    Route::get('/list', [PaymentController::class, 'listPayments'])->name('payment.list');
+    Route::post('/simulate-webhook', [PaymentController::class, 'simulateWebhook'])->name('payment.simulate.webhook');
+});
+
+
 require __DIR__.'/auth.php';
 require __DIR__.'/payment.php';
