@@ -2,3 +2,7 @@
 !private/
 !public/
 !.gitignore
+/firebase-debug.log
+/firebase-credentials.json
+/storage/firebase-credentials.json
+/.env

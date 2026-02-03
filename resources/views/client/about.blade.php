@@ -1,113 +1,114 @@
 @extends('layouts.client.app')
 
-@section('title', 'À Propos de Nous - AraDioni')
+@section('title', 'Notre Vision - AraDioni')
 
 @section('content')
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen bg-gradient-to-br from-violet-50 to-blue-50">
     <!-- Hero Section -->
-    <div class="bg-gradient-to-r from-blue-600 to-blue-800 py-20">
+    <div class="bg-gradient-to-r from-violet-700 to-blue-800 py-20">
         <div class="container mx-auto px-4 text-center">
-            <h1 class="text-4xl md:text-5xl font-bold text-white mb-6">Notre Histoire</h1>
-            <p class="text-xl text-blue-100 max-w-3xl mx-auto">Découvrez la vision panafricaine qui anime AraDioni et son fondateur, Alpha Oumar DIA</p>
+            <br></br>
+       
+            <h1 class="text-4xl md:text-6xl font-bold text-white mb-6">Connecter l'Afrique de Demain</h1>
+            <p class="text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto">Une plateforme innovante conçue pour accélérer les échanges et l'intégration à l'échelle continentale</p>
         </div>
     </div>
 
     <!-- Main Content -->
     <div class="container mx-auto px-4 py-16">
-        <!-- Founder's Story -->
+        <!-- Founder's Vision -->
         <div class="flex flex-col lg:flex-row items-center gap-12 mb-16">
             <div class="lg:w-1/2">
                 <div class="relative">
-                    <img src="{{ asset('images/about-hero.jpg') }}" alt="Alpha Oumar DIA - Fondateur de AraDioni" class="rounded-xl shadow-2xl w-full">
-                    <div class="absolute -bottom-6 -right-6 bg-white p-4 rounded-xl shadow-lg">
-                        <p class="text-sm font-semibold text-blue-600">Alpha Oumar DIA</p>
-                        <p class="text-xs text-gray-600">Fondateur & Visionnaire</p>
+                    <img src="{{ asset('images/about-hero.jpg') }}" alt="Alpha Oumar DIA - Fondateur de AraDioni" class="rounded-2xl shadow-2xl w-full ring-4 ring-white ring-offset-4 ring-offset-blue-50">
+                    <div class="absolute -bottom-6 -right-6 bg-gradient-to-r from-violet-600 to-blue-600 p-6 rounded-2xl shadow-2xl">
+                        <p class="text-lg font-bold text-white">Alpha Oumar DIA</p>
+                        <p class="text-sm text-blue-100">Fondateur & Ingénieur en Informatique</p>
                     </div>
                 </div>
             </div>
             <div class="lg:w-1/2">
-                <h2 class="text-3xl font-bold text-gray-800 mb-6">Alpha Oumar DIA : Un Étudiant Bâtisseur</h2>
-                <div class="space-y-4 text-gray-700">
-                    <p>Né d'une mère guinéenne et avec des origines sénégalaises par son arrière-arrière-grand-père, <strong class="text-blue-600">Alpha Oumar DIA</strong> incarne l'essence même de la jeunesse panafricaine. Étudiant entre la Guinée et le Sénégal, il a personnellement vécu les défis complexes des déplacements, des envois de fonds et de colis, ainsi que de la recherche d'hébergement à travers le continent.</p>
-                    <p>De ces difficultés est née une conviction : <strong class="text-blue-600">l'Afrique ne pourra prospérer que si ses peuples sont connectés simplement, rapidement et de manière fiable.</strong> AraDioni n'est pas qu'une plateforme ; c'est le fruit de cette conviction, une solution concrète créée par un Africain, pour les Africains.</p>
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Vision d'un Ingénieur pour l'Afrique</h2>
+                <div class="space-y-6 text-gray-800 text-lg leading-relaxed">
+                    <p><strong class="text-violet-700">Alpha Oumar DIA</strong>, ingénieur en informatique, porte une vision claire : <strong class="text-blue-600">libérer le potentiel économique de l'Afrique en supprimant les barrières à la connectivité</strong>.</p>
+                    <p>Convaincu que la technologie doit servir le développement concret, il a conçu AraDioni comme une réponse aux défis logistiques et d'accès qui entravent encore les échanges intra-africains.</p>
+                    <p>Sa philosophie ? Créer des ponts numériques robustes et intuitifs pour que les personnes, les idées et les opportunités circulent librement, d'une ville à l'autre, d'un pays à l'autre.</p>
                 </div>
-                <div class="bg-blue-50 border-l-4 border-blue-600 p-6 mt-6 rounded-r-lg">
-                    <p class="text-xl italic text-gray-800">"Notre force réside dans notre unité. En reliant nos villes, nous boostons nos échanges et construisons une Afrique autonome et fière."</p>
-                    <p class="mt-4 font-semibold text-blue-600">— Alpha Oumar DIA, Fondateur</p>
+                <div class="bg-gradient-to-r from-violet-600/10 to-blue-600/10 border-l-4 border-violet-600 p-8 mt-8 rounded-r-2xl">
+                    <p class="text-2xl italic text-gray-900">"L'autonomie de notre continent passe par sa capacité interne à se connecter. Nous bâtissons l'infrastructure numérique qui manquait."</p>
+                    <p class="mt-4 font-bold text-violet-700">— Alpha Oumar DIA, Fondateur</p>
                 </div>
             </div>
         </div>
 
-        <!-- Our Mission -->
+        <!-- Core Mission -->
         <div class="text-center mb-16">
-            <h2 class="text-3xl font-bold text-gray-800 mb-4">Notre Mission : Autonomiser l'Afrique par la Connexion</h2>
-            <p class="text-xl text-gray-600 max-w-4xl mx-auto">Nous œuvrons quotidiennement pour faciliter les échanges intra-africains et renforcer l'intégration économique du continent</p>
+            <h2 class="text-3xl md:text-5xl font-bold text-gray-900 mb-6">Notre Raison d'Être</h2>
+            <p class="text-xl text-gray-700 max-w-4xl mx-auto">Transformer la complexité des déplacements et de la logistique en une expérience fluide, fiable et entièrement intégrée</p>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-8 mb-16">
-            <div class="bg-white p-8 rounded-xl shadow-lg text-center hover:shadow-xl transition-shadow">
-                <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <i class="fas fa-route text-2xl"></i>
+        <div class="grid md:grid-cols-3 gap-8 mb-20">
+            <div class="bg-white p-10 rounded-2xl shadow-xl text-center hover:shadow-2xl transition-all duration-300 border border-gray-100">
+                <div class="w-20 h-20 bg-gradient-to-br from-violet-100 to-blue-100 text-violet-700 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-md">
+                    <i class="fas fa-shipping-fast text-3xl"></i>
                 </div>
-                <h3 class="text-xl font-semibold text-gray-800 mb-4">Relier les Villes</h3>
-                <p class="text-gray-600">Nous créons des corridors numériques et logistiques pour fluidifier les échanges entre les grandes métropoles et les zones moins desservies.</p>
+                <h3 class="text-2xl font-bold text-gray-900 mb-6">Logistique Intelligente</h3>
+                <p class="text-gray-700">Nous optimisons le suivi et la livraison de colis à travers un réseau fiable, offrant transparence et tranquillité d'esprit à chaque étape.</p>
             </div>
             
-            <div class="bg-white p-8 rounded-xl shadow-lg text-center hover:shadow-xl transition-shadow">
-                <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <i class="fas fa-hand-holding-usd text-2xl"></i>
+            <div class="bg-white p-10 rounded-2xl shadow-xl text-center hover:shadow-2xl transition-all duration-300 border border-gray-100">
+                <div class="w-20 h-20 bg-gradient-to-br from-violet-100 to-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-md">
+                    <i class="fas fa-bed text-3xl"></i>
                 </div>
-                <h3 class="text-xl font-semibold text-gray-800 mb-4">Booster les Échanges</h3>
-                <p class="text-gray-600">En simplifiant les transactions financières et l'envoi de marchandises, nous participons à la création d'un marché intra-africain dynamique.</p>
+                <h3 class="text-2xl font-bold text-gray-900 mb-6">Accès à l'Hébergement</h3>
+                <p class="text-gray-700">Nous facilitons la recherche et la réservation d'hébergements adaptés, simplifiant les séjours professionnels ou personnels à travers le continent.</p>
             </div>
             
-            <div class="bg-white p-8 rounded-xl shadow-lg text-center hover:shadow-xl transition-shadow">
-                <div class="w-16 h-16 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <i class="fas fa-globe-africa text-2xl"></i>
+            <div class="bg-white p-10 rounded-2xl shadow-xl text-center hover:shadow-2xl transition-all duration-300 border border-gray-100">
+                <div class="w-20 h-20 bg-gradient-to-br from-violet-100 to-blue-100 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-md">
+                    <i class="fas fa-project-diagram text-3xl"></i>
                 </div>
-                <h3 class="text-xl font-semibold text-gray-800 mb-4">Rêver l'Autonomie</h3>
-                <p class="text-gray-600">Chaque service utilisé sur AraDioni est un pas de plus vers une Afrique moins dépendante des circuits externes.</p>
+                <h3 class="text-2xl font-bold text-gray-900 mb-6">Intégration Numérique</h3>
+                <p class="text-gray-700">Notre plateforme sert de hub central, connectant différents services essentiels pour créer un écosystème numérique unifié et efficient.</p>
             </div>
         </div>
 
-        <!-- Our Presence -->
-        <div class="bg-gray-100 rounded-xl p-8 mb-16">
-            <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Notre Présence en Afrique de l'Ouest</h2>
-            <div class="grid md:grid-cols-2 gap-8">
-                <div class="bg-white p-6 rounded-lg">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mr-4">
-                            <i class="fas fa-map-marker-alt"></i>
+        <!-- Strategic Presence -->
+        <div class="bg-gradient-to-r from-white to-blue-50/50 rounded-2xl p-12 mb-16 border border-gray-200 shadow-lg">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-12 text-center">Implantation Stratégique</h2>
+            <div class="grid md:grid-cols-2 gap-10">
+                <div class="bg-white p-8 rounded-xl shadow-md border-l-4 border-blue-600">
+                    <div class="flex items-center mb-6">
+                        <div class="w-14 h-14 bg-gradient-to-r from-blue-100 to-violet-100 text-blue-700 rounded-xl flex items-center justify-center mr-5 shadow-sm">
+                            <i class="fas fa-map-marked-alt text-xl"></i>
                         </div>
-                        <h3 class="text-xl font-semibold">Sénégal - Siège Principal</h3>
+                        <h3 class="text-2xl font-bold text-gray-900">Sénégal<br><span class="text-lg font-semibold text-blue-600">Siège Principal & Innovation</span></h3>
                     </div>
-                    <p class="text-gray-600 mb-2">Dakar, Rue 25 X 20</p>
-                    <p class="text-gray-600">Centre névralgique de nos opérations pour l'Afrique de l'Ouest</p>
+                    <p class="text-gray-700"><span class="font-semibold">Dakar</span> – Notre centre de R&D et hub technologique, d'où nous orchestrons le développement de solutions à l'échelle ouest-africaine.</p>
                 </div>
                 
-                <div class="bg-white p-6 rounded-lg">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mr-4">
-                            <i class="fas fa-map-marker-alt"></i>
+                <div class="bg-white p-8 rounded-xl shadow-md border-l-4 border-violet-600">
+                    <div class="flex items-center mb-6">
+                        <div class="w-14 h-14 bg-gradient-to-r from-violet-100 to-blue-100 text-violet-700 rounded-xl flex items-center justify-center mr-5 shadow-sm">
+                            <i class="fas fa-map-marked-alt text-xl"></i>
                         </div>
-                        <h3 class="text-xl font-semibold">Guinée - Siège Opérationnel</h3>
+                        <h3 class="text-2xl font-bold text-gray-900">Guinée<br><span class="text-lg font-semibold text-violet-600">Siège Opérationnel</span></h3>
                     </div>
-                    <p class="text-gray-600 mb-2">Conakry, Cosa</p>
-                    <p class="text-gray-600">Plateforme stratégique pour desservir la sous-région</p>
+                    <p class="text-gray-700"><span class="font-semibold">Conakry</span> – Le cœur de nos opérations sur le terrain, assurant la mise en œuvre et l'adaptation locale de nos services.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Call to Action -->
-        <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-12 text-center text-white">
-            <h3 class="text-2xl font-bold mb-4">Rejoignez la Révolution AraDioni</h3>
-            <p class="text-xl mb-8 max-w-2xl mx-auto">Utilisez des services conçus pour vous, par ceux qui comprennent vos défis et partagent vos ambitions</p>
-            <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <a href="{{ route('register') }}" class="bg-white text-blue-600 hover:bg-blue-50 font-medium py-3 px-8 rounded-lg transition duration-300">
-                    Créer un Compte
+        <!-- Final CTA -->
+        <div class="bg-gradient-to-r from-violet-700 via-blue-700 to-blue-800 rounded-2xl p-16 text-center text-white shadow-2xl">
+            <h3 class="text-3xl md:text-4xl font-bold mb-6">Prêt à Repenser la Connectivité Africaine ?</h3>
+            <p class="text-xl mb-10 max-w-2xl mx-auto text-blue-100">Rejoignez une plateforme qui place l'innovation technologique au service du développement continental.</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-6">
+                <a href="{{ route('register') }}" class="bg-white text-gray-900 hover:bg-gray-100 font-bold py-4 px-12 rounded-xl transition duration-300 shadow-lg hover:shadow-xl text-lg">
+                    Démarrer l'Expérience
                 </a>
-                <a href="{{ route('contact') }}" class="border-2 border-white text-white hover:bg-white hover:text-blue-600 font-medium py-3 px-8 rounded-lg transition duration-300">
-                    Nous Contacter
+                <a href="{{ route('contact') }}" class="border-2 border-white text-white hover:bg-white/20 font-bold py-4 px-12 rounded-xl transition duration-300 text-lg">
+                    Échanger avec Notre Équipe
                 </a>
             </div>
         </div>
@@ -117,11 +118,12 @@
 
 @section('styles')
 <style>
-    .hover\:shadow-xl {
-        transition: all 0.3s ease;
+    .hover\:shadow-2xl:hover {
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        transform: translateY(-5px);
     }
-    .hover\:shadow-xl:hover {
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    .transition-all {
+        transition-property: all;
     }
 </style>
 @endsection
